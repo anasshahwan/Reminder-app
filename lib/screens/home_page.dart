@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'constants.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -43,16 +44,56 @@ class _HomePageState extends State<HomePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        DatePicker.showDatePicker(context,
+                            showTitleActions: true,
+                            minTime: DateTime(2018, 3, 5),
+                            maxTime: DateTime(2019, 6, 7),
+                            theme: DatePickerTheme(
+                                headerColor: Colors.orange,
+                                backgroundColor: Colors.blue,
+                                itemStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18),
+                                doneStyle:
+                                TextStyle(color: Colors.white, fontSize: 16)),
+                            onChanged: (date) {
+                              print('change $date in time zone ' +
+                                  date.timeZoneOffset.inHours.toString());
+                            }, onConfirm: (date) {
+                              print('confirm $date');
+                            }, currentTime: DateTime.now(), locale: LocaleType.en);
+                      },
+                      child: Text(
+                        'Choose Time ',
+                        style: TextStyle(color: Colors.blue),
+                      )),
 
-                Text("Choose A Date"),
+
                 Container(
                   height: 25.0,
                   width: 1.0,
                   color: Colors.black,
                   margin: const EdgeInsets.only(left: 10.0, right: 10.0),
                 ),
-                Text("Choose Time"),
 
+
+                  FlatButton(
+                      onPressed: () {
+                        DatePicker.showTime12hPicker(context, showTitleActions: true,
+                            onChanged: (date) {
+                              print('change $date in time zone ' +
+                                  date.timeZoneOffset.inHours.toString());
+                            }, onConfirm: (date) {
+                              print('confirm $date');
+                            }, currentTime: DateTime.now());
+                      },
+                      child: Text(
+                        'choose Time',
+                        style: TextStyle(color: Colors.blue),
+                      )),
 
               ],),
               RaisedButton(
