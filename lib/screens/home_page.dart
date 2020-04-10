@@ -1,129 +1,72 @@
 import 'package:flutter/material.dart';
-import 'constants.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:reminderapplatest/widgets/bottomSheet_widget.dart';
+import 'package:reminderapplatest/widgets/drawer_widget.dart';
+import '../constants.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:sortedmap/sortedmap.dart';
+import '../widgets/reminder_card.dart';
+import '../services/ReminderClass.dart';
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  void _onBottomPressed(){
-    showModalBottomSheet(context: context,
+
+  ReminderClass _reminderClass = ReminderClass();
+  BottomSheetWidget _bottomSheetWidget = BottomSheetWidget();
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _reminderClass.initializeNotifications();
+
+  }
+
+  void _openBottomSheet() async{
+
+   await  showModalBottomSheet(context: context,
         isScrollControlled: true,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
         backgroundColor: Colors.white,
         builder: (context){
-      return Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+   return  _bottomSheetWidget.openBottomSheetToAddReminder(context);
 
-        child: Container(
-          height: 200,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-            Text("Add a Reminder"),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Row(
-                  children: <Widget>[
-                    Container(child: Text("Title")),
-        Container(
-          width: 240,
-          child: TextField(
-            decoration: new InputDecoration(
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    contentPadding: EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
-                    hintText: 'Subject'
-          ),),
-        ),
-                  ],
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  FlatButton(
-                      onPressed: () {
-                        DatePicker.showDatePicker(context,
-                            showTitleActions: true,
-                            minTime: DateTime(2018, 3, 5),
-                            maxTime: DateTime(2019, 6, 7),
-                            theme: DatePickerTheme(
-                                headerColor: Colors.orange,
-                                backgroundColor: Colors.blue,
-                                itemStyle: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18),
-                                doneStyle:
-                                TextStyle(color: Colors.white, fontSize: 16)),
-                            onChanged: (date) {
-                              print('change $date in time zone ' +
-                                  date.timeZoneOffset.inHours.toString());
-                            }, onConfirm: (date) {
-                              print('confirm $date');
-                            }, currentTime: DateTime.now(), locale: LocaleType.en);
-                      },
-                      child: Text(
-                        'Choose Time ',
-                        style: TextStyle(color: Colors.blue),
-                      )),
+    }).then((onValue){ setState(() {}); });
+  }
 
 
-                Container(
-                  height: 25.0,
-                  width: 1.0,
-                  color: Colors.black,
-                  margin: const EdgeInsets.only(left: 10.0, right: 10.0),
-                ),
 
+  sortTheDataByDate(remindersData){
 
-                  FlatButton(
-                      onPressed: () {
-                        DatePicker.showTime12hPicker(context, showTitleActions: true,
-                            onChanged: (date) {
-                              print('change $date in time zone ' +
-                                  date.timeZoneOffset.inHours.toString());
-                            }, onConfirm: (date) {
-                              print('confirm $date');
-                            }, currentTime: DateTime.now());
-                      },
-                      child: Text(
-                        'choose Time',
-                        style: TextStyle(color: Colors.blue),
-                      )),
+    var map = new SortedMap(Ordering.byValue());
+    for ( var x in remindersData){
+      var idAndTitle = x.id.toString() +'^'+ x.title;
+      map.addAll({
+        idAndTitle: x.body,
+      });
+    }
+    dynamic ls = map.values.toList();
+    dynamic mp = map.keys.toList();
 
-              ],),
-              RaisedButton(
-child: Text("Add  "),
-                onPressed: (){
-                print("addedd");
-                Navigator.pop(context);
-//                var count = 0;
-//                Navigator.popUntil(context, (route) {
-//                  return count++ == 1;
-//                });
-                // Navigator.pop(context);
-
-
-              },)
-          ],),
-        ),
-      );
-
-    });
+    return [ls,mp];
+    
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-
+      bottom: false,
+    //  top: false,
       child: Scaffold(
 
 appBar: AppBar(
   backgroundColor: Colors.transparent,
+
   elevation: 0.0,
   leading: Builder(
     builder: (BuildContext context) {
@@ -131,7 +74,6 @@ appBar: AppBar(
         onTap: (){
           Scaffold.of(context).openDrawer();
         },
-
         child: Container(
           padding: EdgeInsets.only(left: 10),
           alignment: Alignment.topLeft,
@@ -146,104 +88,13 @@ appBar: AppBar(
 
 
 ),
-      drawer: Drawer(
-        // Add a ListView to the drawer. This ensures the user can scroll
-        // through the options in the drawer if there isn't enough vertical
-        // space to fit everything.
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            Align(
-              alignment: Alignment.topRight,
-              child: Container(
-                height: 70,
-                padding: EdgeInsets.all(10),
-                child: IconButton(
-                  icon: Icon(Icons.close),
-                  iconSize: 30,
-                  color: Colors.white,
-                  onPressed: (){
-                    Navigator.pop(context);
-
-                  },
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                  borderRadius: BorderRadius.only(bottomLeft:Radius.circular(25)),
-                ),
-              ),
-            ),
-            Card(
-              child: ListTile(
-                title: Text('Add A Reminder '),
-                leading:new Tab(icon: new Image.asset("images/notification_add_icon.png",height: 20,),),
-
-                onTap: () {
-                  Navigator.pop(context);
-
-                  _onBottomPressed();
-                  // Update the state of the app.
-                  // ...
-                },
-              ),
-            ), 
-            Card(
-              child: ListTile(
-                title: Text('Tell a Friend'),
-                leading:Icon(Icons.share),
-
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
-                },
-              ),
-            ),
-            Card(
-              child: ListTile(
-                title: Text('Rate Us'),
-                leading:Icon(Icons.star_half),
-
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
-                },
-              ),
-            ),
-            Card(
-              child: ListTile(
-                title: Text('Contact Us '),
-                leading:Icon(Icons.comment),
-
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
-                },
-              ),
-            ),
-             Card(
-              child: ListTile(
-                title: Text('About Us  '),
-                leading:Icon(Icons.group),
-
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
-                },
-              ),
-            ),
-          ],
-        ),
-      )
+      drawer:Drawer(child: DrawerWidget(onPressed: (){
+        setState(() {});
+      },))
       ,
 
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-
-            print("Open Bottom sheet ");
-            _onBottomPressed();
-
-          },
+          onPressed: _openBottomSheet,
           child: new Tab(icon: new Image.asset("images/notification_add_icon.png")),
           backgroundColor: Colors.white,
         ),
@@ -254,26 +105,74 @@ appBar: AppBar(
               padding: EdgeInsets.only(left: 10),
 
               child: Text("Up Coming Reminders",style: headerTextStyle,)),
+          SizedBox(height: 15,),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(8),
-              children: <Widget>[
+            child: FutureBuilder(
+              future: _reminderClass.chekPendingNotificationRequests(), // a Future<String> or null
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none: return new Text('Press button to start');
+                  case ConnectionState.waiting: return new CircularProgressIndicator();
+                  default:
+                    if (snapshot.hasError)
+                      return new Text('Error: ${snapshot.error}');
+                    else
+                    {
+                      var dataLength = snapshot.data.length;
+                      if(dataLength == 0){
+                        return Center(child: Center(
+                          child: GestureDetector(
+                            onTap: (){
+                              _openBottomSheet();
+                            },
+                            child: Wrap(
+                              direction: Axis.horizontal,
+                       crossAxisAlignment: WrapCrossAlignment.center,
+                       //   mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text("No Reminders for this day, tap on ",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15),),
+                                Image.asset("images/notification_add_icon.png",height: 30),
+                                Text('to add new one.',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15),),
+                              ],
+                            ),
+                          ),
+                        ));
+                      }else {
+
+                       var sortedReminders =  sortTheDataByDate(snapshot.data,);
+                       var sortedDates = sortedReminders[0];
+                       var sortedTitles = sortedReminders[1];
+                       print(sortedReminders);
+
+                        return  ListView.builder(
+                          itemCount: sortedDates.length,
+                          itemBuilder: (context, index) {
+
+                            return Column(
+                              children: <Widget>[
+
+                                CustomCard(reminderTitle: sortedTitles[index],reminderBody: sortedDates[index],onPressed:(){
+                                  setState(() {
+
+                                  });
+                                }),
+                                SizedBox(height: 10,)
+                                //     Text(snapshot.data[index])
+                              ],
+                            );
+
+                          },
+                        );
 
 
-                CustomCard(),
-                CustomCard(),
-                CustomCard(),
-                CustomCard(),
-                CustomCard(),
-                CustomCard(),
-                CustomCard(),
-                CustomCard(),
-                CustomCard(),
-                CustomCard(),
-                CustomCard(),
-              ],
-            ),
+                      }
 
+
+
+                    }
+                }
+              },
+            )
           )
         ],
       ),),
@@ -282,39 +181,8 @@ appBar: AppBar(
 }
 
 
-class CustomCard extends StatefulWidget {
-  @override
-  _CustomCardState createState() => _CustomCardState();
-}
 
-class _CustomCardState extends State<CustomCard> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 75,
-      margin: EdgeInsets.all(5),
-      decoration: new BoxDecoration(
-          color: silverColor,
-          borderRadius: new BorderRadius.all(Radius.circular(25))
-      ),
-      child: Container(
-        padding: EdgeInsets.all(10),
-        alignment: Alignment.topLeft,
-        child: Column(
-          children: <Widget>[
-            Align(
-                alignment: Alignment.topLeft,
-                child: Text('Reminder Title ',style: reminderTitleTextStyle,)),
-            Align(
-                alignment: Alignment.topLeft,
-                child: Text('3/12/2020 , 10:20 PM',style: reminderDateTimeTextStyle,)),
 
-          ],
-        ),
-      ),
-    );
 
-  }
 
-}
 
